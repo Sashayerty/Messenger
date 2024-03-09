@@ -1,8 +1,19 @@
 {% extends "base.html"%}
 {% block main %}
-<div class="card">
+<div class="container d-flex justify-content-center mt-5">
+  <div class="card" style="width: 100rem; height: 40rem;">
+    <div class="card-header">
+      #Чатик с ChatGPT
+    </div>
     <div class="card-body">
-        <h1 class="text-center">Здесь будет чат с ChatGPT</h1>
+        <h1 class="text-center">Здесь будет чат</h1>
     </div>
   </div>
+</div>
+<div class="container d-flex justify-content-start mt-3">
+  <div class="input-group mb-3">
+    <input type="text" class="form-control focus-ring focus-ring-dark py-1 px-1 text-decoration-none border rounded-2" placeholder="Message" aria-label="Message" aria-describedby="button-addon2">
+    <button class="btn btn-outline-success" type="button" id="button-addon2">Send</button>
+  </div>
+</div>
 {% endblock %}
