@@ -1,8 +1,30 @@
 {% extends "base.html" %}
 {% block main %}
-<div class="card">
-    <div class="card-body">
-        <h1 class="text-center">Логин</h1>
+<h1 class="text-center mb-3 mt-5">Авторизация</h1>
+<div class="container d-flex justify-content-center">
+  <form action="" method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.username.label }}<br>
+        {{ form.username(class="form-control") }}<br>
+        {% for error in form.username.errors %}
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
     </div>
-  </div>
+    {% endfor %}
+    </p>
+    <p>
+        {{ form.password.label }}<br>
+        {{ form.password(class="form-control", type="password") }}<br>
+        {% for error in form.password.errors %}
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+    {% endfor %}
+    </p>
+    <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+    <p class="d-flex justify-content-center">{{ form.submit(type="submit", class="btn btn-outline-success") }}</p>
+</form>
+</div>
+
 {% endblock %}
