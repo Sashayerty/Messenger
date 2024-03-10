@@ -1,11 +1,18 @@
 {% extends 'base.html'%}
 
 {% block main %}
-
-<div class="card">
-    <div class="card-body">
-        <h1 class="text-center">Друзья</h1>
+<div class="container d-flex justify-content-center">
+  <div class="card mt-5" style="width: 100rem;">
+    <div class="card-header">
+      <div class="input-group">
+        <input type="text" class="form-control focus-ring focus-ring-dark py-1 px-1 text-decoration-none border rounded-2" placeholder="Найти друга по id" aria-label="id" aria-describedby="button-addon2">
+        <button class="btn btn-outline-success" type="button" id="button-addon2">Search</button>
+      </div>
     </div>
+      <div class="card-body">
+          <h1 class="text-center">Друзья</h1>
+      </div>
   </div>
+</div>
 
 {% endblock %}
