@@ -1,7 +1,7 @@
 {% extends "base.html"%}
 {% block main %}
 <div class="container d-flex justify-content-center mt-5">
-  <div class="card" style="width: 100rem; ">
+  <div class="card" style="width: 100rem; min-height: 40rem;">
     <div class="card-header">
       #Чатик с ChatGPT
     </div>
@@ -23,7 +23,7 @@
 <div class="container mt-3" style="width: 30rel;">
   <form class="d-flex justify-content-center" action="" method="post">
     {{ form.hidden_tag() }}
-    {{ form.message(class="form-control", type="message") }}<br>
+    {{ form.message(class="form-control focus-ring focus-ring-dark py-1 px-1 text-decoration-none border rounded-2", type="message", placeholder="Message") }}<br>
               {% for error in form.message.errors %}
                   <div class="alert alert-danger" role="alert">
                       {{ error }}

@@ -9,7 +9,6 @@ from flask_login import LoginManager, current_user, login_required, login_user, 
 from g4f.client import Client
 from g4f.Provider import RetryProvider, Phind, FreeChatgpt, Liaobots
 import g4f.debug
-import json
 
 """Константы"""
 
