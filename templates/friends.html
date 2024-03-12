@@ -10,7 +10,13 @@
       </div>
     </div>
       <div class="card-body">
-          <h1 class="text-center">Друзья</h1>
+          {% for items in users %}
+          <div class="card">
+            <div class="card-body">
+              {{ items }}
+            </div>
+          </div>
+          {% endfor %}
       </div>
   </div>
 </div>
