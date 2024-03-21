@@ -1,5 +1,4 @@
 from flask import Flask, redirect, render_template
-import sqlalchemy
 from data.users import User
 from forms.login_form import LoginForm
 from forms.reg_form import RegisterForm
@@ -9,6 +8,7 @@ from flask_login import LoginManager, current_user, login_required, login_user, 
 from g4f.client import Client
 from g4f.Provider import RetryProvider, Phind, FreeChatgpt, Liaobots
 import g4f.debug
+from data.AI import AI
 
 """Константы"""
 
@@ -16,16 +16,7 @@ app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'Sdslg35KO236SafA49F21'
-client = Client(provider=RetryProvider([Phind, Liaobots, FreeChatgpt], shuffle=False)) # создание клиента для chatGPT
-g4f.debug.logging = True
-
-data = [] # список всех сообщений с chatGPT
-
-def chat_GPT(mess):
-    """Функция для обновления сообщений с chatGPT"""
-    data.append({"role": "user", "content": mess})
-    response = client.chat.completions.create(model="", messages=data)
-    data.append({"role": "assistance", "content": response.choices[0].message.content})
+GPT = AI() # Создание ИИ
 
 
 @login_manager.user_loader
@@ -33,10 +24,14 @@ def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
 
+# Главная страница
+
 @app.route('/')
 @app.route('/index')
 def index():
   return render_template('index.html', title='SimpleChat')
+
+# Чатик
 
 
 @app.route('/chat')
@@ -44,15 +39,19 @@ def chat():
   form = ChatForm()
   return render_template('chat.html', title='Чат с User')
 
+# Чатик GPT
+
 
 @app.route('/chatgpt', methods=['GET', 'POST'])
 @login_required
 def chatGPT():
   form = ChatForm()
   if form.validate_on_submit():
-        chat_GPT(form.message.data)
-        return render_template('chatgpt.html', title='Чат с ChatGpt', form=form, messages=data)
-  return render_template('chatgpt.html', title='Чат с ChatGpt', form=form, messages=data)
+        GPT.message(form.message.data)
+        return render_template('chatgpt.html', title='Чат с ChatGpt', form=form, messages=GPT.messages())
+  return render_template('chatgpt.html', title='Чат с ChatGpt', form=form, messages=GPT.messages())
+
+# Вход
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -69,12 +68,16 @@ def login():
                                form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
+# Выход
+
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect("/")
+
+# Регистрация
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -104,11 +107,17 @@ def register():
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
 
+# Друзья
+
 
 @app.route('/friends')
 def friends():
-    users = ['Sasa', 'Andrew', 'Das']
+    db_sess = db_session.create_session()
+    users = [1, 2, 3, 4]
+    print(list(users))
     return render_template('friends.html', title='Друзья', users=users)
+
+# Профиль
 
 @app.route('/profile')
 @login_required
@@ -119,7 +128,7 @@ def profile():
 
 def main():
     db_session.global_init("db/users.db")
-    app.run()
+    app.run(debug=True)
 
 if __name__ == '__main__':
   main()

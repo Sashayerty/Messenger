@@ -9,11 +9,11 @@
       {% for mess in messages %}
           {% if mess["role"] == 'user' %}
             <p class="text-end">
-              {{ current_user.name }}: {{ mess["content"] }}
+              {{ current_user.name }}: {{ mess["text"] }}
             </p>
-          {% else %}
+          {% elif  mess["role"] == "assistant" %}
             <p class="text-start text-success-emphasis" style="max-width: 50rem;">
-              ChatGPT: {{ mess["content"] }}
+              ChatGPT: {{ mess["text"].replace("`", "").replace("*", "") }}
             </p>
           {% endif %}
       {% endfor %}
