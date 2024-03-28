@@ -23,6 +23,7 @@
             {% endfor %}
         </p>
         <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+        <p class="text-center">Ещё нет аккаунта? <a href="/register" style="text-decoration: none;">Зарегистрироваться</a></p>
         <p class="d-flex justify-content-center">{{ form.submit(type="submit", class="btn btn-outline-success") }}</p>
         <div>{{ message }}</div>
     </form>

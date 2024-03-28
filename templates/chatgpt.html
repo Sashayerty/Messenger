@@ -2,8 +2,8 @@
 {% block main %}
 <div class="container d-flex justify-content-center mt-5">
   <div class="card" style="width: 100rem; min-height: 40rem;">
-    <div class="card-header">
-      #Чатик с ChatGPT
+    <div class="card-header d-flex justify-content-between">
+      #Чатик с ChatGPT <a href="/delete-chatgpt" style="color: white;">Очистить чат</a>
     </div>
     <div class="card-body">
       {% for mess in messages %}
