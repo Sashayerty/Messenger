@@ -1,4 +1,5 @@
 import requests
+from api_keys.api_gpt import API_KEY
 
 
 class AI():
@@ -20,7 +21,7 @@ class AI():
         self.url = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
         self. headers = {
             "Content-Type": "application/json",
-            "Authorization": "Api-Key AQVNwFAQh-XfyyyskPWcU_v1Xgfva9lhAfrkt_dD"
+            "Authorization": f"Api-Key {API_KEY}"
         }
 
     def message(self, mess):  

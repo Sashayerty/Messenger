@@ -5,9 +5,6 @@ from forms.reg_form import RegisterForm
 from forms.chat import ChatForm
 from data import db_session
 from flask_login import LoginManager, current_user, login_required, login_user, logout_user
-from g4f.client import Client
-from g4f.Provider import RetryProvider, Phind, FreeChatgpt, Liaobots
-import g4f.debug
 from data.AI import AI
 
 """Константы"""
