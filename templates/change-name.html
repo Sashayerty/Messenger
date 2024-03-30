@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block main %}
+    <div class="container mt-5 d-flex justify-content-center">
+        <form action="" method="post" style="width: 30rem;">
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.name.label }}<br>
+                {{ form.name(class="form-control focus-ring focus-ring-dark py-1 px-1 text-decoration-none border rounded-2", type="name") }}<br>
+                {% for error in form.name.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.password.label }}<br>
+                {{ form.password(class="form-control focus-ring focus-ring-dark py-1 px-1 text-decoration-none border rounded-2", type="password") }}<br>
+                {% for error in form.password.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </p>
+            <p class="d-flex justify-content-center">{{ form.submit(type="submit", class="btn btn-outline-success") }}</p>
+            {{message}}
+        </form>
+    </div>
+{% endblock %}

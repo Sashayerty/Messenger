@@ -2,19 +2,53 @@
 {% block main %}
 <div class="container d-flex justify-content-center mt-5">
   <div class="card" style="width: 100rem; height: 40rem;">
-    <div class="card-header">
-      #Чатик с User
+    <div class="card-header d-flex justify-content-between" style="align-items: center;">
+        #Чатик
+      <div class="dropdown">
+        <a class="btn btn-outline-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          Выбрать пользователя
+        </a>  
+        <ul class="dropdown-menu">
+          {% if friends != 'У Вас нет друзей! Для начала общения добавьте минимум одного друга!' %}
+            {% for i in friends %}
+              <li><a class="dropdown-item" href="/chat/{{ i.id }}">{{ i.name }}</a></li>
+            {% endfor %}
+          {% else %}
+            <li>{{ friends }}</li>
+          {% endif %}
+        </ul>
+      </div>
     </div>
     <div class="card-body">
-        <h1 class="text-center">Здесь будет чат</h1>
+      {% if messages %}
+        {% for mess in messages %}
+          {% if mess["role"] == current_user.id %}
+            <p class="text-end">
+              {{ current_user.name }}: {{ mess["text"] }}
+            </p>
+          {% else %}
+            <p class="text-start text-success-emphasis" style="max-width: 50rem;">
+              {{ name_of_friend }}: {{ mess["text"] }}
+            </p>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        <h1 class="text-center">У вас нет сообщений</h1>
+      {% endif %}
     </div>
   </div>
 </div>
-<div class="container d-flex justify-content-start mt-3">
-  <div class="input-group mb-3">
-    <input type="text" class="form-control focus-ring focus-ring-dark py-1 px-1 text-decoration-none border rounded-2" placeholder="Message" aria-label="Message" aria-describedby="button-addon2">
-    <button class="btn btn-outline-success" type="button" id="button-addon2">Send</button>
-  </div>
+<div class="container mt-3" style="width: 30rel;">
+  <form class="d-flex justify-content-center" action="" method="post">
+    {{ form.hidden_tag() }}
+    {{ form.message(class="form-control focus-ring focus-ring-dark py-1 px-1 text-decoration-none border rounded-2", type="message", placeholder="Message") }}<br>
+              {% for error in form.message.errors %}
+                  <div class="alert alert-danger" role="alert">
+                      {{ error }}
+                  </div>
+              {% endfor %}
+    {{ form.send(type="submit", class="btn btn-outline-success") }}
+  </form>
 </div>
 
 {% endblock %}

@@ -1,6 +1,8 @@
 from flask import Flask, redirect, render_template
 from data.users import User
 from forms.login_form import LoginForm
+from forms.change_name_form import ChangeName
+from forms.change_email_form import ChangeEmail
 from forms.reg_form import RegisterForm
 from forms.add_friends import FriendsForm
 from forms.chat import ChatForm
@@ -40,7 +42,49 @@ def index():
 @app.route('/chat')
 def chat():
     form = ChatForm()
-    return render_template('chat.html', title='Чат с User')
+    db_sess = db_session.create_session()
+    if db.reference(f'/Friends/{current_user.id}').get():
+        frnds = []
+        for i in [int(j) for j in db.reference(f'/Friends/{current_user.id}').get().split(', ')]:
+            frnds.append(db_sess.query(User).filter_by(id=i).first())
+    else:
+        frnds = 'У Вас нет друзей! Для начала общения добавьте минимум одного друга!'
+    return render_template('chat.html', title='Чат с User', friends=frnds, form=form)
+
+
+# Чатик с определенным ползователем
+
+@app.route('/chat/<int:id_of_user>', methods=["POST", "GET"])
+def chat_with_user(id_of_user):
+    if id_of_user in [int(j) for j in db.reference(f'/Friends/{current_user.id}').get().split(', ')]:
+        form = ChatForm()
+        db_sess = db_session.create_session()
+        if db.reference(f'/Friends/{current_user.id}').get():
+            frnds = []
+            for i in [int(j) for j in db.reference(f'/Friends/{current_user.id}').get().split(', ')]:
+                frnds.append(db_sess.query(User).filter_by(id=i).first())
+        else:
+            frnds = 'У Вас нет друзей! Для начала общения добавьте минимум одного друга!'
+        mess = db.reference(f'/Chats/{' '.join(sorted([str(current_user.id), str(id_of_user)]))}').get()
+        if form.validate_on_submit():
+            if mess:
+                mess.append({
+                    "role": current_user.id,
+                    "text": form.message.data
+                })
+            else:
+                mess = [{
+                    "role": current_user.id,
+                    "text": form.message.data
+                }]
+            db.reference(f'/Chats/').update({
+                ' '.join(sorted([str(current_user.id), str(id_of_user)])): mess
+            })
+        return render_template('chat.html', title=f'Чат с {db_sess.query(User).filter_by(id=id_of_user).first().name}',
+                               friends=frnds, messages=mess,
+                               name_of_friend=db_sess.query(User).filter_by(id=id_of_user).first().name, form=form)
+    else:
+        return render_template('error.html', title='Это не Ваш друг', error='Это не Ваш друг')
 
 
 # Чатик GPT
@@ -62,18 +106,21 @@ def chatGPT():
                          })
         GPT.set_messages(
             {
-                    "role": "system",
-                    "text": "Ты ии-программист."
-                }
+                "role": "system",
+                "text": "Ты ии-программист."
+            }
         )
     if form.validate_on_submit():
-        GPT.set_messages(db.reference(f'/Chat with GPT/{current_user.id}').get())     
+        GPT.set_messages(db.reference(f'/Chat with GPT/{current_user.id}').get())
         GPT.message(form.message.data)
         db_fire.add_data(f'/Chat with GPT/', {
             current_user.id: GPT.get_messages()
         })
-        return render_template('chatgpt.html', title='Чат с ChatGpt', form=form, messages=db.reference(f'/Chat with GPT/{current_user.id}').get())
-    return render_template('chatgpt.html', title='Чат с ChatGpt', form=form, messages=db.reference(f'/Chat with GPT/{current_user.id}').get())
+        return render_template('chatgpt.html', title='Чат с ChatGpt', form=form,
+                               messages=db.reference(f'/Chat with GPT/{current_user.id}').get())
+    return render_template('chatgpt.html', title='Чат с ChatGpt', form=form,
+                           messages=db.reference(f'/Chat with GPT/{current_user.id}').get())
+
 
 # Очистка чата с GPT
 
@@ -84,6 +131,7 @@ def delete_chatGPT():
         current_user.id: ''
     })
     return redirect('/chatgpt')
+
 
 # Вход
 
@@ -161,9 +209,12 @@ def friends():
     else:
         friends_ids = []
     if form.validate_on_submit():
-        users = db_sess.query(User).filter(User.name == form.name_of_user.data, User.id not in friends_ids, User.id != current_user.id)
-        return render_template('friends.html', title='Друзья', users=users, form=form, search=True, friends_ids=friends_ids)
+        users = db_sess.query(User).filter(User.name == form.name_of_user.data, User.id not in friends_ids,
+                                           User.id != current_user.id)
+        return render_template('friends.html', title='Друзья', users=users, form=form, search=True,
+                               friends_ids=friends_ids)
     return render_template('friends.html', title='Друзья', users=users, form=form, friends_ids=friends_ids)
+
 
 # Добавление в друзья
 
@@ -187,6 +238,7 @@ def add_to_friends(id_of_user):
         id_of_user: ', '.join(friends)
     })
     return redirect('/friends')
+
 
 # Удаление из друзей
 
@@ -212,7 +264,6 @@ def delete_from_friends(id_of_user):
     return redirect('/friends')
 
 
-
 # Профиль
 
 @app.route('/profile')
@@ -221,6 +272,40 @@ def profile():
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter_by(id=current_user.id).first()
     return render_template('profile.html', title='Профиль', user=user)
+
+
+# Имзенение имени
+
+@app.route('/change-name', methods=['POST', 'GET'])
+@login_required
+def change_name():
+    form = ChangeName()
+    db_sess = db_session.create_session()
+    if form.validate_on_submit():
+        user = db_sess.query(User).filter_by(id=current_user.id).first()
+        user.name = form.name.data
+        db_sess.commit()
+        return redirect('/profile')
+    return render_template('change-name.html', title='Изменить имя', form=form)
+
+
+# Имзенение почты
+
+@app.route('/change-email', methods=['POST', 'GET'])
+@login_required
+def change_email():
+    form = ChangeEmail()
+    db_sess = db_session.create_session()
+    if form.validate_on_submit():
+        if db_sess.query(User).filter(User.email == form.email.data).first():
+            return render_template('change-email.html', title='Изменить почту',
+                                   form=form,
+                                   message="Эта почта уже используется")
+        user = db_sess.query(User).filter_by(id=current_user.id).first()
+        user.email = form.email.data
+        db_sess.commit()
+        return redirect('/profile')
+    return render_template('change-email.html', title='Изменить почту', form=form)
 
 
 def main():

@@ -4,11 +4,11 @@
 <div class="container mt-5 d-flex justify-content-center">
     <div class="card" style="width: 100rem;">
         <div class="card-header">
-            <h1 class="text-center">Привет, {{ current_user.name }}</h1>
+            <h1 class="text-center">Привет, <a data-bs-target="change-name" href="/change-name" style="color: white;">{{ current_user.name }}</a></h1>
         </div>   
         <div class="card-body">
-            <div class="card-body">
-                Email: {{ user.email }}
+            <div class="card-body d-flex justify-content-between" style="align-items: center;">
+                Email: {{ user.email }} <a class="btn btn-outline-primary" href="/change-email">Изменить</a>
             </div>
         </div>
     </div>
