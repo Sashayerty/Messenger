@@ -40,6 +40,7 @@ def index():
 
 
 @app.route('/chat')
+@login_required
 def chat():
     form = ChatForm()
     db_sess = db_session.create_session()
@@ -49,12 +50,13 @@ def chat():
             frnds.append(db_sess.query(User).filter_by(id=i).first())
     else:
         frnds = 'У Вас нет друзей! Для начала общения добавьте минимум одного друга!'
-    return render_template('chat.html', title='Чат с User', friends=frnds, form=form)
+    return render_template('chat.html', title='Чат с User', friends=frnds, form=form, chat=False)
 
 
 # Чатик с определенным ползователем
 
 @app.route('/chat/<int:id_of_user>', methods=["POST", "GET"])
+@login_required
 def chat_with_user(id_of_user):
     if id_of_user in [int(j) for j in db.reference(f'/Friends/{current_user.id}').get().split(', ')]:
         form = ChatForm()
@@ -82,7 +84,7 @@ def chat_with_user(id_of_user):
             })
         return render_template('chat.html', title=f'Чат с {db_sess.query(User).filter_by(id=id_of_user).first().name}',
                                friends=frnds, messages=mess,
-                               name_of_friend=db_sess.query(User).filter_by(id=id_of_user).first().name, form=form)
+                               name_of_friend=db_sess.query(User).filter_by(id=id_of_user).first().name, form=form, chat=True)
     else:
         return render_template('error.html', title='Это не Ваш друг', error='Это не Ваш друг')
 
@@ -223,7 +225,7 @@ def friends():
 def add_to_friends(id_of_user):
     if db.reference(f'/Friends/{current_user.id}').get():
         friends = db.reference(f'/Friends/{current_user.id}').get().split(', ')
-        friends.append(str(id_of_user))
+        friends.append(str(id_of_user)) if str(id_of_user) not in friends else None
     else:
         friends = str(id_of_user)
     db.reference(f'/Friends/').update({

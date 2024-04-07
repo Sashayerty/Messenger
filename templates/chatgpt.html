@@ -2,8 +2,8 @@
 {% block main %}
 <div class="container d-flex justify-content-center mt-5">
   <div class="card" style="width: 100rem; min-height: 40rem;">
-    <div class="card-header d-flex justify-content-between">
-      #Чатик с ChatGPT <a href="/delete-chatgpt" style="color: white;">Очистить чат</a>
+    <div class="card-header d-flex justify-content-between" style="align-items: center;">
+      #Чатик с ChatGPT <a class="btn btn-outline-secondary" href="/delete-chatgpt">Очистить чат</a>
     </div>
     <div class="card-body">
       {% for mess in messages %}
@@ -13,7 +13,7 @@
             </p>
           {% elif  mess["role"] == "assistant" %}
             <p class="text-start text-success-emphasis" style="max-width: 50rem;">
-              ChatGPT: {{ mess["text"].replace("`", "").replace("*", "") }}
+              ChatGPT 🤖: {{ mess["text"].replace("`", "").replace("*", "") }}
             </p>
           {% endif %}
       {% endfor %}
@@ -23,13 +23,13 @@
 <div class="container mt-3" style="width: 30rel;">
   <form class="d-flex justify-content-center" action="" method="post">
     {{ form.hidden_tag() }}
-    {{ form.message(class="form-control focus-ring focus-ring-dark py-1 px-1 text-decoration-none border rounded-2", type="message", placeholder="Message") }}<br>
+    {{ form.message(class="form-control focus-ring focus-ring-dark py-1 px-1 text-decoration-none border rounded-2", type="message", placeholder="Сообщение") }}<br>
               {% for error in form.message.errors %}
                   <div class="alert alert-danger" role="alert">
                       {{ error }}
                   </div>
               {% endfor %}
-    {{ form.send(type="submit", class="btn btn-outline-success") }}
+    {{ form.send(type="submit", class="btn btn-outline-warning") }}
   </form>
 </div>
 {% endblock %}

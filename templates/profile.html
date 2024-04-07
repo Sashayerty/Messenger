@@ -3,12 +3,12 @@
 {% block main %}
 <div class="container mt-5 d-flex justify-content-center">
     <div class="card" style="width: 100rem;">
-        <div class="card-header">
-            <h1 class="text-center">Привет, <a data-bs-target="change-name" href="/change-name" style="color: white;">{{ current_user.name }}</a></h1>
+        <div class="card-header text-center">
+            <h1 class="text-center">Привет, <a data-bs-target="change-name" href="/change-name" style="color: white; text-decoration: none;">{{ current_user.name }}</a>👋</h1>Для изменения имени тыкни на него
         </div>   
         <div class="card-body">
             <div class="card-body d-flex justify-content-between" style="align-items: center;">
-                Email: {{ user.email }} <a class="btn btn-outline-primary" href="/change-email">Изменить</a>
+                Email: {{ user.email }} <a class="btn btn-outline-warning" href="/change-email">Изменить</a>
             </div>
         </div>
     </div>

@@ -5,4 +5,4 @@ from wtforms.validators import DataRequired
 
 class ChatForm(FlaskForm):
     message = StringField(validators=[DataRequired()])
-    send = SubmitField('Send')
+    send = SubmitField('Отправить')

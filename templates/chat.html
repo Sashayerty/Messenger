@@ -1,7 +1,7 @@
 {% extends "base.html"%}
 {% block main %}
 <div class="container d-flex justify-content-center mt-5">
-  <div class="card" style="width: 100rem; height: 40rem;">
+  <div class="card" style="width: 100rem; min-height: 40rem;">
     <div class="card-header d-flex justify-content-between" style="align-items: center;">
         #Чатик
       <div class="dropdown">
@@ -20,6 +20,12 @@
       </div>
     </div>
     <div class="card-body">
+      <!-- <script>
+        function update_messages(){
+          const messages = get(ref(db, 'Chats/'));
+        }
+        setTimeout(update_messages, 1000)
+      </script> -->
       {% if messages %}
         {% for mess in messages %}
           {% if mess["role"] == current_user.id %}
@@ -33,22 +39,41 @@
           {% endif %}
         {% endfor %}
       {% else %}
+        {% if chat %}
         <h1 class="text-center">У вас нет сообщений</h1>
+        {% else %}
+        <h1 class="text-center">Выберите друга для начала общения</h1>
+        {% endif %}
       {% endif %}
     </div>
   </div>
 </div>
 <div class="container mt-3" style="width: 30rel;">
-  <form class="d-flex justify-content-center" action="" method="post">
-    {{ form.hidden_tag() }}
-    {{ form.message(class="form-control focus-ring focus-ring-dark py-1 px-1 text-decoration-none border rounded-2", type="message", placeholder="Message") }}<br>
-              {% for error in form.message.errors %}
-                  <div class="alert alert-danger" role="alert">
-                      {{ error }}
-                  </div>
-              {% endfor %}
-    {{ form.send(type="submit", class="btn btn-outline-success") }}
-  </form>
+  {% if chat %}
+    <form class="d-flex justify-content-center" action="" method="post">
+      {{ form.hidden_tag() }}
+      {{ form.message(class="form-control focus-ring focus-ring-dark py-1 px-1 text-decoration-none border rounded-2", type="message", placeholder="Сообщение") }}<br>
+                {% for error in form.message.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+      {{ form.send(type="submit", class="btn btn-outline-warning") }}
+    </form>
+  {% else %}
+    <form action="" method="post">
+      <fieldset  class="d-flex justify-content-center" disabled>
+        {{ form.hidden_tag() }}
+        {{ form.message(class="form-control focus-ring focus-ring-dark py-1 px-1 text-decoration-none border rounded-2", type="message", placeholder="Сообщение") }}<br>
+                {% for error in form.message.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+        {{ form.send(type="submit", class="btn btn-outline-warning") }}
+      </fieldset>
+    </form>
+  {% endif %}
 </div>
 
 {% endblock %}
