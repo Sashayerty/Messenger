@@ -4,12 +4,13 @@
   <div class="card" style="width: 100rem; min-height: 40rem;">
     <div class="card-header d-flex justify-content-between" style="align-items: center;">
         #Чатик
+        <p id="con"></p>
       <div class="dropdown">
         <a class="btn btn-outline-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
           Выбрать пользователя
         </a>  
         <ul class="dropdown-menu">
-          {% if friends != 'У Вас нет друзей! Для начала общения добавьте минимум одного друга!' %}
+          {% if friends != 'У Вас нет друзей...' %}
             {% for i in friends %}
               <li><a class="dropdown-item" href="/chat/{{ i.id }}">{{ i.name }}</a></li>
             {% endfor %}
@@ -20,12 +21,6 @@
       </div>
     </div>
     <div class="card-body">
-      <!-- <script>
-        function update_messages(){
-          const messages = get(ref(db, 'Chats/'));
-        }
-        setTimeout(update_messages, 1000)
-      </script> -->
       {% if messages %}
         {% for mess in messages %}
           {% if mess["role"] == current_user.id %}
@@ -52,7 +47,10 @@
   {% if chat %}
     <form class="d-flex justify-content-center" action="" method="post">
       {{ form.hidden_tag() }}
-      {{ form.message(class="form-control focus-ring focus-ring-dark py-1 px-1 text-decoration-none border rounded-2", type="message", placeholder="Сообщение") }}<br>
+      {{ form.message(class="form-control focus-ring focus-ring-dark py-1 px-1 text-decoration-none border rounded-2", type="message", placeholder="Сообщение", id='message') }}<br>
+      <script>
+        document.getElementById("message").value="";
+      </script>
                 {% for error in form.message.errors %}
                     <div class="alert alert-danger" role="alert">
                         {{ error }}
@@ -61,7 +59,7 @@
       {{ form.send(type="submit", class="btn btn-outline-warning") }}
     </form>
   {% else %}
-    <form action="" method="post">
+    <!-- <form action="" method="post">
       <fieldset  class="d-flex justify-content-center" disabled>
         {{ form.hidden_tag() }}
         {{ form.message(class="form-control focus-ring focus-ring-dark py-1 px-1 text-decoration-none border rounded-2", type="message", placeholder="Сообщение") }}<br>
@@ -72,7 +70,7 @@
                 {% endfor %}
         {{ form.send(type="submit", class="btn btn-outline-warning") }}
       </fieldset>
-    </form>
+    </form> -->
   {% endif %}
 </div>
 

@@ -22,16 +22,16 @@
               {% if items.id not in friends_ids %}
                 <div class="card mb-1">
                   <div class="card-body d-flex justify-content-between" style="align-items: center;">
-                    {{ items.name }}
-                    <a href="/add-to-friends/{{ items.id }}" class="btn btn-outline-success">Добавить в друзья</a>
+                    <a href="/profile/{{ items.id }}" style="text-decoration: none; color: white;">{{ items.name }}</a>
+                    <button type="button" onclick="location.href='/add-to-friends/{{ items.id }}'" class="btn btn-outline-success">Добавить в друзья</button>
                   </div>
                 </div>
               {% endif %}
             {% else %}
             <div class="card mb-1">
               <div class="card-body d-flex justify-content-between" style="align-items: center;">
-                {{ items.name }}
-                <a href="/delete-from-friends/{{ items.id }}" class="btn btn-outline-danger">Удалить</a>
+                <a href="/profile/{{ items.id }}" style="text-decoration: none; color: white;">{{ items.name }}</a>
+                <button type="button" onclick="location.href='/delete-from-friends/{{ items.id }}'" class="btn btn-outline-danger">Удалить</button>
               </div>
             </div>
             {% endif %}

@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template
+from flask import Flask, redirect, render_template, flash, request, url_for
 from data.users import User
 from forms.login_form import LoginForm
 from forms.change_name_form import ChangeName
@@ -11,6 +11,8 @@ from flask_login import LoginManager, current_user, login_required, login_user, 
 from data.AI import AI
 from firebase_admin import db
 from data.firebase_admin import *
+from werkzeug.utils import secure_filename
+import os
 
 """Константы"""
 
@@ -18,6 +20,8 @@ app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'Sdslg35KO236SafA49F21'
+app.config['UPLOAD_FOLDER'] = '/imgs/avatars'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 GPT = AI()  # Создание ИИ
 db_fire = FirebaseAdmin()
 
@@ -26,6 +30,11 @@ db_fire = FirebaseAdmin()
 def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
+
+
+@app.route('/add-photo', methods=['GET', 'POST'])
+def upload_file():
+    pass
 
 
 # Главная страница
@@ -49,7 +58,7 @@ def chat():
         for i in [int(j) for j in db.reference(f'/Friends/{current_user.id}').get().split(', ')]:
             frnds.append(db_sess.query(User).filter_by(id=i).first())
     else:
-        frnds = 'У Вас нет друзей! Для начала общения добавьте минимум одного друга!'
+        frnds = 'У Вас нет друзей...'
     return render_template('chat.html', title='Чат с User', friends=frnds, form=form, chat=False)
 
 
@@ -66,7 +75,7 @@ def chat_with_user(id_of_user):
             for i in [int(j) for j in db.reference(f'/Friends/{current_user.id}').get().split(', ')]:
                 frnds.append(db_sess.query(User).filter_by(id=i).first())
         else:
-            frnds = 'У Вас нет друзей! Для начала общения добавьте минимум одного друга!'
+            frnds = 'У Вас нет друзей...'
         mess = db.reference(f'/Chats/{' '.join(sorted([str(current_user.id), str(id_of_user)]))}').get()
         if form.validate_on_submit():
             if mess:
@@ -82,9 +91,14 @@ def chat_with_user(id_of_user):
             db.reference(f'/Chats/').update({
                 ' '.join(sorted([str(current_user.id), str(id_of_user)])): mess
             })
-        return render_template('chat.html', title=f'Чат с {db_sess.query(User).filter_by(id=id_of_user).first().name}',
-                               friends=frnds, messages=mess,
-                               name_of_friend=db_sess.query(User).filter_by(id=id_of_user).first().name, form=form, chat=True)
+        return render_template('chat.html', 
+                                title=f'Чат с {db_sess.query(User).filter_by(id=id_of_user).first().name}',
+                                friends=frnds,
+                                messages=mess,
+                                name_of_friend=db_sess.query(User).filter_by(id=id_of_user).first().name,
+                                form=form, 
+                                chat=True, 
+                                ref=sorted([str(current_user.id), str(id_of_user)]))
     else:
         return render_template('error.html', title='Это не Ваш друг', error='Это не Ваш друг')
 
@@ -273,7 +287,17 @@ def delete_from_friends(id_of_user):
 def profile():
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter_by(id=current_user.id).first()
-    return render_template('profile.html', title='Профиль', user=user)
+    return render_template('profile.html', title='Профиль', user=user, current_us=True)
+
+
+# Профиль определенного человека
+
+@app.route('/profile/<int:id_of_user>')
+@login_required
+def profie_of_user(id_of_user):
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter_by(id=id_of_user).first()
+    return render_template('profile.html', title='Профиль', user=user, current_us=False)
 
 
 # Имзенение имени
@@ -308,6 +332,13 @@ def change_email():
         db_sess.commit()
         return redirect('/profile')
     return render_template('change-email.html', title='Изменить почту', form=form)
+
+# Проверка валидности файла
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def main():
