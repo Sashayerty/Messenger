@@ -10,23 +10,37 @@
     <title>{{title}}</title>
 </head>
 <body>
+  <style type="text/css">
+    /* noto-sans-mono-regular - cyrillic_latin */
+    @font-face {
+      font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+      font-family: 'Noto Sans Mono';
+      font-style: normal;
+      font-weight: 400;
+      src: url('../fonts/noto-sans-mono-v30-cyrillic_latin-regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+    }
+
+    body {
+      font-family: 'Noto Sans Mono';
+    }
+  </style>
     <header class="header">
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
-              <a class="navbar-brand" href="/">SimpleChat💬</a>
+              <a class="navbar-brand" href="/">SimpleChat</a>
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
               </button>
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                   <li class="nav-item">
-                    <a class="nav-link" href="/chat">Чат✏️</a>
+                    <a class="nav-link" href="/chat">Чат</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="/chatgpt">Чат с ChatGPT🤖</a>
+                    <a class="nav-link" href="/chatgpt">Чат с ChatGPT</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="/friends">Друзья🗿</a>
+                    <a class="nav-link" href="/friends">Друзья</a>
                   </li>
                 </ul>
                 {% if current_user.is_authenticated %}

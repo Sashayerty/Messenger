@@ -13,6 +13,7 @@ from firebase_admin import db
 from data.firebase_admin import *
 from werkzeug.utils import secure_filename
 import os
+from data.random_ava import generate_image
 
 """Константы"""
 
@@ -40,7 +41,6 @@ def upload_file():
 # Главная страница
 
 @app.route('/')
-@app.route('/index')
 def index():
     return render_template('index.html', title='SimpleChat')
 

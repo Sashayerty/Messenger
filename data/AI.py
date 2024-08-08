@@ -1,5 +1,8 @@
 import requests
-from api_keys.api_gpt import API_KEY
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 
 class AI():
@@ -17,7 +20,7 @@ class AI():
         self.url = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
         self. headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Api-Key {API_KEY}"
+            "Authorization": f"Api-Key {os.getenv("API_KEY")}"
         }
 
     def message(self, mess): 
