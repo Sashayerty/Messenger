@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, flash, request, url_for
+from flask import Flask, redirect, render_template, flash, request, send_from_directory, url_for
 from data.users import User
 from forms.login_form import LoginForm
 from forms.change_name_form import ChangeName
@@ -25,6 +25,7 @@ app.config['UPLOAD_FOLDER'] = '/imgs/avatars'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 GPT = AI()  # Создание ИИ
 db_fire = FirebaseAdmin()
+bucket = FirebaseBucket()
 
 
 @login_manager.user_loader
@@ -37,6 +38,10 @@ def load_user(user_id):
 def upload_file():
     pass
 
+
+@app.route('/fonts/<path:filename>')
+def custom_static(filename):
+    return send_from_directory('fonts', filename)
 
 # Главная страница
 
@@ -76,7 +81,7 @@ def chat_with_user(id_of_user):
                 frnds.append(db_sess.query(User).filter_by(id=i).first())
         else:
             frnds = 'У Вас нет друзей...'
-        mess = db.reference(f'/Chats/{' '.join(sorted([str(current_user.id), str(id_of_user)]))}').get()
+        mess = db.reference(f'/Chats/{" ".join(sorted([str(current_user.id), str(id_of_user)]))}').get()
         if form.validate_on_submit():
             if mess:
                 mess.append({
