@@ -3,21 +3,23 @@
 {% block main %}
 <div class="container mt-5 d-flex justify-content-center">
     <div class="card" style="width: 100rem;">
-        <div class="card-header text-center">
-            {% if current_us %}
-                <h1 class="text-center">Привет, <a data-bs-target="change-name" href="/change-name" style="color: white; text-decoration: none;">{{ current_user.name }}</a>👋</h1>Для изменения имени тыкни на него
-            {% else %}
-                <h1 class="text-center">{{ user.name }}</h1>
-            {% endif %}
-        </div>   
-        <div class="card-body">
-            <div class="card-body">
-                <div class="card-body d-flex justify-content-between" style="align-items: center;">
-                    Email: {{ user.email }} {% if current_us %}<button type="button" class="btn btn-outline-warning" onclick="location.href = '/change-email'">Изменить</button>{% endif %}
-                </div>
-                
+        <div class="row g-0">
+            <div class="col-md-4">
+              <img src="../fonts/file.jpeg" class="img-fluid rounded" alt="Фото профиля">
             </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h2 class="text">Привет, {{ current_user.name }}!</h2>
+                <h2 class="text">Email: {{ user.email }}</h2>
+              </div>
+            </div>
+          </div>
+        <div style="display: flex; justify-content: space-between;" class="card-footer">
+            <a href="/change-name" style="margin-left: 20rem;" class="btn btn-outline-secondary">Изменить имя</a>
+            <a href="/change-email" class="btn btn-outline-secondary">Изменить почту</a>
+            <a href="/change-photo" style="margin-right: 20rem;" class="btn btn-outline-secondary">Изменить фото профиля</a>
         </div>
+        
     </div>
 </div>
 

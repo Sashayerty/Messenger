@@ -7,22 +7,16 @@ class FirebaseAdmin():
     def __init__(self) -> None:
         self.cred = credentials.Certificate("api_keys/simplechat-39233-firebase-adminsdk-1e0ku-23879c078d.json")
         self.default_app = firebase_admin.initialize_app(self.cred, {
-	        'databaseURL': 'https://simplechat-39233-default-rtdb.europe-west1.firebasedatabase.app/'
+	        'databaseURL': 'https://simplechat-39233-default-rtdb.europe-west1.firebasedatabase.app/',
+            'storageBucket' : 'simplechat-39233.appspot.com'
 	    })
+        self.bucket = storage.bucket()
 
     def get_data(self, path_in_firebase):
         return db.reference(f'{path_in_firebase}').get()
     
     def add_data(self, path_in_firebase, data):
         db.reference(f'{path_in_firebase}').update(data)
-
-class FirebaseBucket():
-    def __init__(self) -> None:
-        self.cred = credentials.Certificate("api_keys/simplechat-39233-firebase-adminsdk-1e0ku-23879c078d.json")
-        self.default_app = firebase_admin.initialize_app(self.cred, {
-            'storageBucket' : 'simplechat-39233.appspot.com'
-	    })
-        self.bucket = storage.bucket()
 
     def get_photo(self, name):
         try:

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container mt-5 d-flex justify-content-center">
+    <div class="card" style="width: 100rem;">
+        {% if unread_nots %}
+        {% for i, data in enumerate(notifications) %}
+        <div class="card mb-1">
+            <div class="card-body d-flex justify-content-between" style="align-items: center;">
+                {{ notifications[i] }}
+            </div>
+          </div>
+        {% endfor %}
+        {% else %}
+          <p class="text-center">{{ notifications[0] }}</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

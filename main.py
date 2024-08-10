@@ -15,17 +15,15 @@ from werkzeug.utils import secure_filename
 import os
 from data.random_ava import generate_image
 
-"""Константы"""
+# Константы
 
 app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'Sdslg35KO236SafA49F21'
-app.config['UPLOAD_FOLDER'] = '/imgs/avatars'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 GPT = AI()  # Создание ИИ
 db_fire = FirebaseAdmin()
-bucket = FirebaseBucket()
 
 
 @login_manager.user_loader
@@ -153,6 +151,20 @@ def delete_chatGPT():
     })
     return redirect('/chatgpt')
 
+# Уведомления
+
+@app.route('/notifications', methods=['GET', 'POST'])
+@login_required
+def notifications():
+    if db.reference(f'Notifications/{current_user.id}').get():
+        notifications = db_fire.get_data(f'Notifications/{current_user.id}')
+    else:
+        notifications = {0: 'У тебя нет уведомлений'}
+        db_fire.add_data(f'Notifications/{current_user.id}', notifications)
+    if len(notifications) > 1:
+        return render_template('notifications.html', title='Уведомления', notifications=notifications, unread_nots=True)
+    else:
+        return render_template('notifications.html', title='Уведомления', notifications=notifications, unread_nots=False)
 
 # Вход
 
@@ -337,6 +349,13 @@ def change_email():
         db_sess.commit()
         return redirect('/profile')
     return render_template('change-email.html', title='Изменить почту', form=form)
+
+# Изменение фото
+
+@app.route('/change-photo', methods=['POST', 'GET'])
+@login_required
+def change_photo():
+    render_template('change-photo.html')
 
 # Проверка валидности файла
 

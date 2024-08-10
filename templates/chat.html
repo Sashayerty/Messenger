@@ -5,20 +5,19 @@
     <div class="card-header d-flex justify-content-between" style="align-items: center;">
         #Чатик
         <p id="con"></p>
+      {% if friends != 'У Вас нет друзей...' %}
       <div class="dropdown">
         <a class="btn btn-outline-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
           Выбрать пользователя
         </a>  
         <ul class="dropdown-menu">
-          {% if friends != 'У Вас нет друзей...' %}
+          
             {% for i in friends %}
               <li><a class="dropdown-item" href="/chat/{{ i.id }}">{{ i.name }}</a></li>
             {% endfor %}
-          {% else %}
-            <li>{{ friends }}</li>
-          {% endif %}
         </ul>
       </div>
+      {% endif %}
     </div>
     <div class="card-body">
       {% if messages %}
@@ -36,6 +35,8 @@
       {% else %}
         {% if chat %}
         <h1 class="text-center">У вас нет сообщений</h1>
+        {% elif friends == 'У Вас нет друзей...' %}
+        <h1 class="text-center">У Вас нет друзей...</h1>
         {% else %}
         <h1 class="text-center">Выберите друга для начала общения</h1>
         {% endif %}

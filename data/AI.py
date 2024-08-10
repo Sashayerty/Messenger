@@ -1,12 +1,12 @@
 import requests
-from dotenv import load_dotenv
-import os
+from dotenv import dotenv_values
 
-load_dotenv()
+key = dotenv_values('api_keys/.env')['key']
 
 
 class AI():
     def __init__(self) -> None:
+        self.key = key
         self.msgs = []
         self.prompt = {
             "modelUri": "gpt://b1gpchf8l5umrbhroffm/yandexgpt-lite",
@@ -18,9 +18,9 @@ class AI():
             "messages": self.msgs
         }
         self.url = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
-        self. headers = {
+        self.headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Api-Key {os.getenv("API_KEY")}"
+            "Authorization": f"Api-Key {self.key}"
         }
 
     def message(self, mess): 
@@ -35,6 +35,7 @@ class AI():
             "role": "assistant",
             "text": result["result"]["alternatives"][0]["message"]["text"]
         })
+        return result
     
 
     def get_messages(self):
