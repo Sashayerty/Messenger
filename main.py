@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, flash, request, send_from_directory, url_for
+from flask import Flask, redirect, render_template, flash, request, send_from_directory, url_for, send_file
 from data.users import User
 from forms.login_form import LoginForm
 from forms.change_name_form import ChangeName
@@ -355,7 +355,14 @@ def change_email():
 @app.route('/change-photo', methods=['POST', 'GET'])
 @login_required
 def change_photo():
-    render_template('change-photo.html')
+    return render_template('change-photo.html')
+
+# Рандомная ава
+
+@app.route('/generate-profile-photo', methods=['GET'])
+def random_ava():
+    ava = generate_image()
+    return send_file(ava, mimetype='image/png')
 
 # Проверка валидности файла
 
