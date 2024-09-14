@@ -10,3 +10,5 @@ config.py
 *.jpg
 *.jpeg
 *.vscode
+ngrok.exe
+users.db

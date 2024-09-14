@@ -1,4 +1,8 @@
 from flask import Flask, redirect, render_template, flash, request, send_from_directory, url_for, send_file
+import requests
+from PIL import Image
+from io import BytesIO
+from data.local_url import local_url as url
 from data.users import User
 from forms.login_form import LoginForm
 from forms.change_name_form import ChangeName
@@ -31,11 +35,14 @@ def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
 
+# Добавление фото
+
 
 @app.route('/add-photo', methods=['GET', 'POST'])
 def upload_file():
     pass
 
+# Подключение к шрифтам
 
 @app.route('/fonts/<path:filename>')
 def custom_static(filename):
@@ -45,9 +52,11 @@ def custom_static(filename):
 
 @app.route('/')
 def index():
-    return render_template('index.html', title='SimpleChat')
-
-
+    if current_user.is_authenticated:
+        return render_template('index.html', title='SimpleChat', url_to_photo=db_fire.get_data(f'user-ava/{current_user.id}'))
+    else:
+        return render_template('index.html', title='SimpleChat')
+    
 # Чатик
 
 
@@ -62,7 +71,7 @@ def chat():
             frnds.append(db_sess.query(User).filter_by(id=i).first())
     else:
         frnds = 'У Вас нет друзей...'
-    return render_template('chat.html', title='Чат с User', friends=frnds, form=form, chat=False)
+    return render_template('chat.html', title='Чат с User', friends=frnds, form=form, chat=False, url_to_photo=db_fire.get_data(f'user-ava/{current_user.id}'))
 
 
 # Чатик с определенным ползователем
@@ -98,12 +107,13 @@ def chat_with_user(id_of_user):
                                 title=f'Чат с {db_sess.query(User).filter_by(id=id_of_user).first().name}',
                                 friends=frnds,
                                 messages=mess,
+                                url_to_photo=db_fire.get_data(f'user-ava/{current_user.id}'),
                                 name_of_friend=db_sess.query(User).filter_by(id=id_of_user).first().name,
                                 form=form, 
                                 chat=True, 
                                 ref=sorted([str(current_user.id), str(id_of_user)]))
     else:
-        return render_template('error.html', title='Это не Ваш друг', error='Это не Ваш друг')
+        return render_template('error.html', title='Это не Ваш друг', error='Это не Ваш друг', url_to_photo=db_fire.get_data(f'user-ava/{current_user.id}'))
 
 
 # Чатик GPT
@@ -136,9 +146,9 @@ def chatGPT():
             current_user.id: GPT.get_messages()
         })
         return render_template('chatgpt.html', title='Чат с ChatGpt', form=form,
-                               messages=db.reference(f'/Chat with GPT/{current_user.id}').get())
+                               messages=db.reference(f'/Chat with GPT/{current_user.id}').get(), url_to_photo=db_fire.get_data(f'user-ava/{current_user.id}'))
     return render_template('chatgpt.html', title='Чат с ChatGpt', form=form,
-                           messages=db.reference(f'/Chat with GPT/{current_user.id}').get())
+                           messages=db.reference(f'/Chat with GPT/{current_user.id}').get(), url_to_photo=db_fire.get_data(f'user-ava/{current_user.id}'))
 
 
 # Очистка чата с GPT
@@ -162,9 +172,9 @@ def notifications():
         notifications = {0: 'У тебя нет уведомлений'}
         db_fire.add_data(f'Notifications/{current_user.id}', notifications)
     if len(notifications) > 1:
-        return render_template('notifications.html', title='Уведомления', notifications=notifications, unread_nots=True)
+        return render_template('notifications.html', title='Уведомления', notifications=notifications, unread_nots=True, url_to_photo=db_fire.get_data(f'user-ava/{current_user.id}'))
     else:
-        return render_template('notifications.html', title='Уведомления', notifications=notifications, unread_nots=False)
+        return render_template('notifications.html', title='Уведомления', notifications=notifications, unread_nots=False, url_to_photo=db_fire.get_data(f'user-ava/{current_user.id}'))
 
 # Вход
 
@@ -218,9 +228,21 @@ def register():
             name=form.name.data,
             email=form.email.data,
         )
+        photo = requests.get(f'{url}/generate-profile-photo')
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
+        if photo.status_code == 200:
+            img = Image.open(BytesIO(photo.content))
+            # Конвертируем изображение в байты
+            byte_io = BytesIO()
+            img.save(byte_io, format='PNG')  # Используем формат JPEG или другой по необходимости
+            image_bytes = byte_io.getvalue()
+            # Уникальное имя файла: Avs/{user_id}.jpg
+            file_name = f'Avs/{user.id}.png'
+            # Загрузка изображения в Firebase Storage
+            temporary_url = db_fire.upload_image_to_firebase(image_bytes, file_name)
+            db_fire.add_data(f'user-ava/', {user.id: temporary_url})
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
 
@@ -245,8 +267,8 @@ def friends():
         users = db_sess.query(User).filter(User.name == form.name_of_user.data, User.id not in friends_ids,
                                            User.id != current_user.id)
         return render_template('friends.html', title='Друзья', users=users, form=form, search=True,
-                               friends_ids=friends_ids)
-    return render_template('friends.html', title='Друзья', users=users, form=form, friends_ids=friends_ids)
+                               friends_ids=friends_ids, url_to_photo=db_fire.get_data(f'user-ava/{current_user.id}'))
+    return render_template('friends.html', title='Друзья', users=users, form=form, friends_ids=friends_ids, url_to_photo=db_fire.get_data(f'user-ava/{current_user.id}'))
 
 
 # Добавление в друзья
@@ -304,7 +326,8 @@ def delete_from_friends(id_of_user):
 def profile():
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter_by(id=current_user.id).first()
-    return render_template('profile.html', title='Профиль', user=user, current_us=True)
+    url_to_users_photo = db_fire.get_data(f'user-ava/{current_user.id}')
+    return render_template('profile.html', title='Профиль', user=user, current_us=True, url_to_photo=url_to_users_photo, url_to_users_photo=url_to_users_photo)
 
 
 # Профиль определенного человека
@@ -314,7 +337,12 @@ def profile():
 def profie_of_user(id_of_user):
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter_by(id=id_of_user).first()
-    return render_template('profile.html', title='Профиль', user=user, current_us=False)
+    url_to_users_photo = db_fire.get_data(f'user-ava/{id_of_user}')
+    if str(id_of_user) == str(current_user.id):
+        current_us = True
+    else:
+        current_us = False
+    return render_template('profile.html', title='Профиль', user=user, current_us=current_us, url_to_photo=db_fire.get_data(f'user-ava/{current_user.id}'), url_to_users_photo=url_to_users_photo)
 
 
 # Имзенение имени
@@ -329,7 +357,7 @@ def change_name():
         user.name = form.name.data
         db_sess.commit()
         return redirect('/profile')
-    return render_template('change-name.html', title='Изменить имя', form=form)
+    return render_template('change-name.html', title='Изменить имя', form=form, url_to_photo=db_fire.get_data(f'user-ava/{current_user.id}'))
 
 
 # Имзенение почты
@@ -348,14 +376,14 @@ def change_email():
         user.email = form.email.data
         db_sess.commit()
         return redirect('/profile')
-    return render_template('change-email.html', title='Изменить почту', form=form)
+    return render_template('change-email.html', title='Изменить почту', form=form, url_to_photo=db_fire.get_data(f'user-ava/{current_user.id}'))
 
 # Изменение фото
 
 @app.route('/change-photo', methods=['POST', 'GET'])
 @login_required
 def change_photo():
-    return render_template('change-photo.html')
+    return render_template('change-photo.html', url_to_photo=db_fire.get_data(f'user-ava/{current_user.id}'))
 
 # Рандомная ава
 
@@ -374,7 +402,7 @@ def allowed_file(filename):
 
 def main():
     db_session.global_init("db/users.db")
-    app.run(debug=True)
+    app.run(debug=True, port='8080')
 
 
 if __name__ == '__main__':

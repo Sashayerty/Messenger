@@ -49,11 +49,11 @@
                   </li>
                 </ul>
                 {% if current_user.is_authenticated %}
-                  <div class="dropdown dropstart">
+                  <div class="dropdown ">
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      <img style="max-height: 25px; border-radius: 12px;" src="../fonts/file.jpeg" alt="Ava" class="navbar-prof-img">
+                      <img style="max-height: 25px; border-radius: 12px;" src="{{ url_to_photo }}" alt="Ava" class="navbar-prof-img">
                     </button>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu dropdown-menu-lg-end">
                       <li><a class="dropdown-item" href="/profile">Профиль</a></li>
                       <li><a href="/notifications" class="dropdown-item">Уведомления</a></li>
                       <li><a style="color: #dc3545;" class="dropdown-item" href="/logout">Выйти</a></li>
