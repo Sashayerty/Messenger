@@ -5,4 +5,4 @@ from wtforms.validators import DataRequired
 
 class FriendsForm(FlaskForm):
     name_of_user = StringField(validators=[DataRequired()])
-    search = SubmitField('Искать')
+    search = SubmitField("Искать")

@@ -1,10 +1,10 @@
 import requests
 from dotenv import dotenv_values
 
-key = dotenv_values('api_keys/.env')['key']
+key = dotenv_values("api_keys/.env")["key"]
 
 
-class AI():
+class AI:
     def __init__(self) -> None:
         self.key = key
         self.msgs = []
@@ -13,34 +13,35 @@ class AI():
             "completionOptions": {
                 "stream": False,
                 "temperature": 0.6,
-                "maxTokens": "5000"
+                "maxTokens": "5000",
             },
-            "messages": self.msgs
+            "messages": self.msgs,
         }
-        self.url = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
+        self.url = (
+            "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
+        )
         self.headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Api-Key {self.key}"
+            "Authorization": f"Api-Key {self.key}",
         }
 
-    def message(self, mess): 
-        self.msgs.append({
-            "role": "user",
-            "text": mess
-        }) 
+    def message(self, mess):
+        self.msgs.append({"role": "user", "text": mess})
         self.prompt["messages"] = self.msgs
-        response = requests.post(self.url, headers=self.headers, json=self.prompt)
+        response = requests.post(
+            self.url, headers=self.headers, json=self.prompt
+        )
         result = response.json()
-        self.prompt["messages"].append({
-            "role": "assistant",
-            "text": result["result"]["alternatives"][0]["message"]["text"]
-        })
+        self.prompt["messages"].append(
+            {
+                "role": "assistant",
+                "text": result["result"]["alternatives"][0]["message"]["text"],
+            }
+        )
         return result
-    
 
     def get_messages(self):
         return self.prompt["messages"]
-    
+
     def set_messages(self, messags):
         self.msgs = messags
- 
